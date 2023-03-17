@@ -1,0 +1,68 @@
+A traditional credential, also known as a certificate or attribute certificate, is a collection of personal characteristics, such as name, date of birth, or personal identification number, that is certified by the issuer by signing it and binding it to the owner through cryptographic means, requiring the use of the user's secret key \cite{FISCHERHBNER2017759}. Using either traditional or anonymous credentials is preferable to direct requests to the certifying party as this prevents user profiling by the certifying party. However, traditional credentials require the disclosure of all attributes together if the user needs to prove certain properties, making it possible for different uses of the same credential to be linked. In addition, the verifier and issuer can link the various uses of the user's credential to the credential issuance.
+
+\subsection*{Chaum}
+Anonymous credentials were first introduced by Chaum in his paper \textit{Security Without Identification: Transaction Systems To Make Big Brother Obsolete} \cite{Chaum1985}. The paper highlighted the struggle between individuals and organizations. Organizations face a challenge in maintaining a pervasive and efficient record-keeping system, which could potentially be linked to national identities and fingerprints to prevent abuse of system resources but that would compromise an individual's privacy.
+
+To address this problem, Chaum proposed the use of \textbf{pseudonyms}, which could be used by individuals when interacting with different organizations, preventing them from being linked. Pseudonyms are the false names used to hide users' actual identities and maintains anonymity. This approach is similar to the use of public keys in modern cryptography, where an individual can use a different public key with each organization to receive encrypted messages that only they can decrypt \cite{rsa}.
+
+Chaum also introduced a new approach to conducting three categories of transactions: communication, payment, and credential. For communication, he used the example of \textit{dining cryptographers} \cite{dining} to send unconditionally untraceable messages and digital signatures for accountability. For payment, he introduced the idea of \textit{blind signatures} \cite{chaum1983blind}, allowing individuals to pay for goods and services without revealing their identity. And finally, for credentials, he proposed using blind signatures to allow individuals to prove their eligibility for certain services or privileges without revealing their complete identity. Similar idea for proving eligibility was adapted by a later system, \textit{Cinderella} \cite{cinderella}.
+
+Overall, Chaum's work on anonymous credentials paved the way for the development of new cryptographic techniques that prioritize individual privacy while still allowing for secure transactions.
+
+\subsection*{Jan Camenisch and Anna Lysyanskaya}
+Camenisch et al. proposed an efficient and secure anonymous credential system that they claim is "considerably superior to previously proposed ones" \cite{Camenisch2001AnES}. In their paper, they provide a formal analysis of the system.  The system includes three entities: a \textbf{user}, a \textbf{verifier}, and an \textbf{organization} where the user requests credentials from the organization, and upon successful verification of their previous credentials by the verifier, the organization grants the credential to the user.
+
+Recall that in the anonymous systems so far \cite{Chaum1985, annaPsuedonym}, the organizations know the users only by pseudonyms where different pseudonyms of the same user cannot be linked. Yet, an organization can issue a credential to a pseudonym, and the corresponding user can prove possession of this
+credential to another organization (who knows her by a different pseudonym), without revealing anything more than the fact that she owns such a credential. Credentials can
+be for unlimited use (these are called multiple-show credentials) and for one-time use (these are called one-show credentials). 
+
+The current system while still uses pseudonyms for identification, it also allows for optional revocation of anonymity in case of abuse, either through global or local revocation, revealing either the true identity or the pseudonym behind the credential. It also prevents transfer of credentials so that the user cannot sell or give away their credentials to other users. In such a scenario, a user who allows one of her friend to use one of her credentials once would allow that friend to impersonate her by giving access to all her credentials.
+
+The non-transferability and optional revocation are variation of the basic credential system built by introducing a trusted \textit{CA}. There are two major assumtions, firstly the CA is trusted to perform its duties properly and secondly, they assume that the channel between the user and the organization is secure and that the user is not being attacked by a malicious verifier. However, later credential systems like \cite{Wang2019} have addressed these issues.
+
+The security of the system relies on the strong RSA assumption and the decisional Diffie-Hellman assumption modulo a strong prime product. The RSA problem involves finding the plaintext given the public key and ciphertext, while the strong RSA assumption states that the problem remains difficult even if the attacker knows the public key exponent. The decisional Diffie-Hellman problem involves determining whether there exist integers $x$ and $y$ such that $a=g^x$, $b=g^y$, and $c=g^{xy}$, where $g$ is a generator of a finite cyclic group $G$ and $a, b, c \in G$.
+
+
+In the later paper \textit{Signature Schemes and Anonymous Credentials from Bilinear Maps} \cite{Camenisch2004SignatureSA}, Camenisch et al present an anonymous credential system based on LRSW assumption \cite{annaPsuedonym}. LRSW Assumption states that let $G$ be a cyclic group with generator $g$ and of order $|G|$. Let $g^x$ and $g^y$ be given. Furthermore, assume that an oracle can be called that answers a query $s$ by a triplet $(a, a^{sy}, a^{x+sxy})$, where $a=g^z$ is a random group element of $G$. Let this oracle be called for $s_1, s_2, ...,$ Then, the problem is to generate a quadruple $(t, b, b^{ty}, b^{x+txy})$, where $t$ is not in ${0, s_1, s_2, ...}$, and where $b$ is not equal to the identity element. Essentially, this assumes that forgery is hard even if the adversary has access to the oracle.
+
+This is unique signature scheme since this is comparable to the efficiency of signatures schemes based on strong RSA assumption and no previous signature scheme based on an assumption related to the discrete logarithm assumption in the plain (as opposed to random-oracle) model comes close to the efficiency of schemes based on the strong RSA assumption. A signature scheme is integral for an anonymous credential system since a credential is a signed message that proves the user's eligibility for a service or privilege. To this end, they provide two protocols to firstly, prove knowledge of a signature on a committed message (verification of a credentials) and to obtain a signature on a committed message (issue of a credential).
+ 
+The protocol to sign a committed message is important because a committed message would contain the identity of the user on which he would want the organization's signature. They do this by committing the message ($m$) as follows: 
+\begin{equation}
+    M = g^m Z^r
+\end{equation}
+Here, $M$ is the committed message, $Z = g^z$ where $g$ is a generator of group $G$ and $z, r \in G$. $M$ is now an information-theoretically hidden message. Then using either the signature scheme B (single block message) or signature scheme C (multiple blocks message) a signature is made on $M$.
+Their signature scheme C is as follows \cite{Camenisch2004SignatureSA}:
+
+\textbf{Key generation} Run the \textit{Setup} algorithm to generate $(q, G, \mathrm{G}, g, \mathrm{~g}, e)$. Here, $G = \langle g \rangle$, $\mathrm{G} = \langle \mathrm{~g} \rangle$ are two groups of prime order $q$ that have a non-degenerate efficiently computable bilinear map $e$.
+
+Choose $x \leftarrow \mathbb{Z}_q, y \leftarrow \mathbb{Z}_q$, and for $1 \leq i \leq \ell, z_i \leftarrow \mathbb{Z}_q$. Let $X=g^x, Y=g^y$ and, for $1 \leq$ $i \leq \ell, Z_i=g^{z_i}$. 
+
+Set $s k=\left(x, y, z_1, \ldots, z_{\ell}\right), p k=\left(q, G, \mathrm{G}, g, \mathrm{~g}, e, X, Y,\left\{Z_i\right\}\right)$.
+
+\textbf{Signature} On input message $\left(m^{(0)}, m^{(1)}, \ldots, m^{(\ell)}\right)$, secret key $s k=(x, y$, $\left.z_1, \ldots, z_{\ell}\right)$, and public key $p k=\left(q, G, \mathrm{G}, g, \mathrm{~g}, e, X, Y,\left\{Z_i\right\}\right)$ do:
+\begin{itemize}[noitemsep]
+\item Choose a random $a \leftarrow G$.
+\item Let $A_i=a^{z_i}$ for $1 \leq i \leq \ell$.
+\item Let $b=a^y, B_i=\left(A_i\right)^y$.
+\item Let $c=a^{x+x y m^{(0)}} \prod_{i=1}^{\ell} A_i^{x y m^{(i)}}$.
+\end{itemize}
+Output $\sigma=\left(a,\left\{A_i\right\}, b,\left\{B_i\right\}, c\right)$.
+
+\textbf{Verification} On input $p k=\left(q, G, \mathrm{G}, g, \mathrm{~g}, e, X, Y,\left\{Z_i\right\}\right)$, message $\left(m^{(0)}, \ldots\right.$, $\left.m^{(\ell)}\right)$, and purported signature $\sigma=\left(a,\left\{A_i\right\}, b,\left\{B_i\right\}, c\right)$, check the following:
+\begin{enumerate}[noitemsep]
+    \item $\left\{A_i\right\}$ were formed correctly: $e\left(a, Z_i\right)=e\left(g, A_i\right)$.
+    \item $b$ and $\left\{B_i\right\}$ were formed correctly: $e(a, Y)=e(g, b)$ and $e\left(A_i, Y\right)=$ $e\left(g, B_i\right)$
+    \item $c$ was formed correctly: $e(X, a) \cdot e(X, b)^{m^{(0)}} \cdot \prod_{i=1}^{\ell} e\left(X, B_i\right)^{m^{(i)}}=e(g, c)$.
+\end{enumerate}
+
+Note that while engaged in the protocol for obtainaing a signature, the user has to show a zero-knowledge proof of knowledge of the opening of the commitment. 
+\begin{equation}
+    P K\left\{\left(\mu^{(0)}, \ldots, \mu^{(\ell)}\right): M=g^{\mu^{(0)}} \prod_{i=1}^{\ell} Z_i^{\mu^{(i)}}\right\}
+\end{equation}
+Here, $\mu^{(0)}, \ldots, \mu^{(\ell)}$ are the quantities that the user has to prove knowledge of.
+
+Once this signature is made, we use the protocol to prove knowledge of a signature on a committed message which requires another zero-knowledge proof. 
+
+
+% How is this signature scheme different from blind signatures?
